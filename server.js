@@ -1,50 +1,86 @@
-// Dependencies
+//  Dependencies
 var express = require("express");
 var bodyParser = require("body-parser");
+var logger = require("morgan");
 var mongoose = require("mongoose");
-//var routes = require("./routes")
-// Initialize Express
+
+var Article = require("./models/Article");
+
 var app = express();
 
-mongoose.Promise = Promise;
+var PORT = process.env.PORT || 3000;
 
-var port = process.env.PORT || 3000;
 
-// Define middleware here
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(logger("dev"));
 app.use(bodyParser.json());
-// Serve up static assets (usually on heroku)
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static("client/build"));
-}
-// Add routes, both API and view
-app.use(routes);
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.text());
+app.use(bodyParser.json({ type: "application/vnd.api+json" }));
 
-// Set mongoose to leverage built in JavaScript ES6 Promises
-mongoose.Promise = Promise;
+app.use(express.static("./public"));
 
-//mongo
+mongoose.connect("mongodb://localhost/nytreactdb");
 
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/nytreactdb";
-
-// Set mongoose to leverage built in JavaScript ES6 Promises
-// Connect to the Mongo DB
 var db = mongoose.connection;
 
-mongoose.connect(MONGODB_URI);
+db.on("error", function(err) {
+  console.log("Mongoose Error: ", err);
+});
 
+db.once("open", function() {
+  console.log("Mongoose connection successful.");
+});
 
-// Show any mongoose errors
-db.on("error", function(error) {
-    console.log("Mongoose Error: ", error);
+// Main "/" Route. This will redirect the user to our rendered React application
+app.get("/", function(req, res) {
+  res.sendFile("../public/index.html");
+});
+
+// This is the route we will send GET requests to retrieve our most recent search data.
+// We will call this route the moment our page gets rendered
+app.get("/api/saved", function(req, res) {
+
+  // We will find all the records, sort it in descending order, then limit the records to 5
+  Article.find({})
+    .exec(function(err, doc){
+
+      if(err){
+        console.log(err);
+      }
+      else {
+        res.send(doc);
+      }
+    })
+});
+
+app.post("/api/saved", function(req, res) {
+
+  var newArticle = new Article({
+    title: req.body.title,
+    date: req.body.date,
+    url: req.body.url
   });
-  
-  // Once logged in to the db through mongoose, log a success message
-  db.once("open", function() {
-    console.log("Mongoose connection successful.");
+
+  newArticle.save(function(err, doc){
+    if(err){
+      console.log(err);
+      res.send(err);
+    } else {
+      res.json(doc);
+    }
+  });
+});
+
+app.delete('/api/saved/:id', function(req, res){
+
+  Article.find({'_id': req.params.id}).remove()
+    .exec(function(err, doc) {
+      res.send(doc);
   });
 
-// Start the API server
-app.listen(port, function() {
-  console.log(`🌎  ==> API Server now listening on PORT ${port}!`);
+});
+
+
+app.listen(PORT, function() {
+  console.log("App listening on PORT: " + PORT);
 });
