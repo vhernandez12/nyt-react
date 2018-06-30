@@ -1,20 +1,21 @@
-import React from "react";
-import Search from "./components/Search";
-import Saved from "./components/Saved";
-import Header from "./components/Header";
-import Nav from "./components/Nav";
-import Results from "./components/Results";
-import Footer from "./components/Footer";
+import React, { Component } from "react";
+import "./App.css";
+import Home from "./pages/Home";
+import Saved from "./pages/Saved";
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-const App = () => (  
-    <div >
-      <Header />
-      <Nav />
-      <Search />
-      <Results />
-      <Saved />
-      <Footer />
-    </div>
-);
 
+class App extends Component {
+  render() {
+    return (
+      <Router>
+        <div>
+          <Route exact path="/" component={Home} />
+          <Route exact path="/saved" component={Saved} />
+        </div>
+      </Router>          
+    );
+  }
+}  
+   
 export default App;
