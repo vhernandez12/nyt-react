@@ -1,9 +1,9 @@
 import React, { Component } from  "react";
-import Header from "./components/Header";
-import Navbar from "./components/Nav";
-import Search from "./components/Search";
-import Results from "./components/Results";
-import Footer from "./components/Footer";
+import Header from "../../components/Header";
+import Navbar from "../../components/Nav";
+import Search from "../../components/Search";
+import Results from "../../components/Results";
+import ResultItems from "../../components/ResultItems";
 import api from "../../utils/API"
 
 class Home extends Component {
@@ -59,12 +59,13 @@ class Home extends Component {
     render() {
         return (
             <div>
-                <Jumbotron />
+                <Navbar />
+                <Header />
                  <Search
                     handleFormSubmit={this.handleFormSubmit}                
                     handleTopicChange={this.handleTopicChange}               
                     handleStartYearChange={this.handleStartYearChange}                
-                     handleEndYearChange={this.handleEndYearChange}/>                                              
+                    handleEndYearChange={this.handleEndYearChange}/>                                              
                    
                 <Results>                
                     {this.state.articles.map(article => {
@@ -76,13 +77,12 @@ class Home extends Component {
                     title={article.headline.main}
                     date={article.pub_date}
                     url={article.web_url}
-                    snippet={article.snippet}
                     handleSaveButton={this.handleSaveButton}
                                             />                
                     );
                 })}
                 </Results>
-                <Footer />
+                
          </div>
         );
     }

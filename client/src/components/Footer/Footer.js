@@ -1,9 +1,13 @@
 import React from "react";
 
-const Footer = () => (
-    <div className="jumbotron text-center" >
-    <p>Footer</p>
-    </div>
-);
+const Footer = (props) => {
+    return (
+     <div>
+        <div className="jumbotron text-center" >
+        <p>Footer</p>
+        </div>
+     </div>
+    );
+};
 
 export default Footer;
